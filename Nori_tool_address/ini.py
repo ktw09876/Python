@@ -13,6 +13,7 @@ df['end2'] = start2 + word_cnt-1
 
 
 
+
 ini.to_csv('Nori_tool_address/ini_scans/ini1.csv' #읽어들인 .txt 파일을 .csv 파일로 생성
            , encoding='utf-8-sig' 
            , index=False) #인덱스는 생성하지 않겠다
