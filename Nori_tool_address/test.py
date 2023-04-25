@@ -3,17 +3,42 @@ import pandas as pd
 data_scan = pd.read_csv('Nori_tool_address/data/data1.csv', encoding='cp949')
 ini_scan = pd.read_csv('Nori_tool_address/ini_scans/ini1.csv')
 
-# df1 = pd.read_csv("Nori_tool_address/test/example1.csv", header=None) # aaa bbb ccc ddd eee
-# df2 = pd.read_csv("Nori_tool_address/test/example2.csv" , header=None) # aaa bbb
 
-result = data_scan[data_scan['Tag_group'].isin(ini_scan['태그 그룹'])]['Tag_group'].tolist() # df2의 첫 번째 열에 존재하는 값만 추출하여 리스트로 반환
-df = pd.DataFrame(result)
+# 함수 정의
+def calculate_full_address(data_scan_row):
+    AD_FLAG = ''
+    PLC_AREA = ''
+    FULL_ADDRESS = ''
+    cal_scan_buffer = ''
 
-for i in data_scan.index:
-    for j in df.index:
-        # if data_scan.iloc[i]['Tag_group'] == df.iloc[j]:
-            print(data_scan.iloc[i]['Tag_group'])
+    if data_scan_row['Tag_group'] in ini_scan['태그 그룹'].values:
+        ini_scan_row = ini_scan[ini_scan['태그 그룹'] == data_scan_row['Tag_group']]
+        ini_scan_row = ini_scan_row.squeeze()
 
-# print(result)
+        if int(data_scan_row['scan_buffer']) >= int(ini_scan_row['start2']) and int(data_scan_row['scan_buffer']) <= int(ini_scan_row['end2']):
+            AD_FLAG = 'OK'
+            PLC_AREA = ini_scan_row['레지스트 영역'][:3]
+
+            if int(ini_scan_row['레지스트 영역'][-5:]) > int(ini_scan_row['레지스트 영역2']):
+                cal_scan_buffer = int(data_scan_row['scan_buffer']) + (int(ini_scan_row['레지스트 영역'][-5:]) - int(ini_scan_row['레지스트 영역2']))
+            elif int(ini_scan_row['레지스트 영역'][-5:]) < int(ini_scan_row['레지스트 영역2']):
+                cal_scan_buffer = int(data_scan_row['scan_buffer']) - (int(ini_scan_row['레지스트 영역2']) - int(ini_scan_row['레지스트 영역'][-5:]))
+            else:
+                cal_scan_buffer = data_scan_row['scan_buffer']
+
+            FULL_ADDRESS = PLC_AREA + str(cal_scan_buffer).rjust(5,'0')
+
+            if not pd.isna(data_scan_row['비트']):
+                FULL_ADDRESS += '.' + str(int(data_scan_row['비트'])).rjust(2, '0')
+        else:
+            AD_FLAG = 'ERROR_SCAN_NO'
+    else:
+        AD_FLAG = 'NO_TAG_GROUP'
+
+    return pd.Series([AD_FLAG, PLC_AREA, FULL_ADDRESS, cal_scan_buffer])
+
+# apply()를 사용하여 함수 적용
+data_scan[['AD_FLAG', 'PLC_AREA', 'FULL_ADDRESS', 'cal_scan_buffer']] = data_scan.apply(calculate_full_address, axis=1)
+
 
 
