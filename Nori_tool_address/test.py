@@ -4,6 +4,7 @@
 # ini_scan = pd.read_csv('Nori_tool_address/ini_scans/ini1.csv')
 
 # # 원본 data의 행 개수가 늘어났을 때 .apply() 를 이용한 좀 더 효율적인 방법
+
 # # # 함수 정의
 # def calculate_full_address(data_scan_row):
 #     AD_FLAG = ''
