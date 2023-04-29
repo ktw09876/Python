@@ -110,13 +110,10 @@ for i, data_scan_row in data_scan.iterrows(): #iterrows() 각 행의 인덱스�
 # print(data_scan)
 
 # # 오라클 연동 ing...
-# conn = cx_Oracle.connect(user="your_username", password="your_password", dsn="your_dsn")
-
-# # create a dataframe
-# df = pd.DataFrame({'column1': [1, 2, 3], 'column2': ['A', 'B', 'C']})
+# conn = cx_Oracle.connect(user="username", password="password", dsn="dsn")
 
 # # insert the dataframe into the Oracle database
-# df.to_sql(name='your_table_name', con=conn, if_exists='append', index=False)
+# data_scan.to_sql(name='table_name', con=conn, if_exists='append', index=False)
 
 
 #데이터프레임의 구분자에 따라 접두사와 접미사를 다르게 해서 .csv 파일을 생성하는 중 ing...
