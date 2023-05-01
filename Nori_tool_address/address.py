@@ -14,51 +14,12 @@ data_list = [
 #데이터프레임 생성, '라인 구분' 컬럼 추가
 data_dfs = []
 for data_name in data_list:
-    df = pd.read_csv(data_path + data_name, encoding='cp949')
+    df = pd.read_csv(data_path + data_name, dtype={'비트': 'Int64'}, encoding='cp949')
     df['라인 구분'] = df['Tag_group'].str.slice(0,3)
     data_dfs.append(df)
 
-
-data_scan = pd.concat(data_dfs, ignore_index=True) #읽어들인 데이터프레임을 하나로 합친다
-ini_scan = pd.read_csv('Nori_tool_address/ini_scans/ini1.csv')
-
-# data_scan = pd.DataFrame({
-#     'Tag_group':[
-#         'L10_111','L10_111','L10_111','L10_111','L10_111','L10_222','L10_222','L10_222','L10_222','L10_333','L10_333','L10_333','L10_333','L10_333','L10_444','L10_444'
-#     ],
-#     'Tag_name': [
-#         None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None
-#     ],
-#     'scan_buffer':[
-#         '10','100','1000','2000','4000','18000','19000','20000','22000','6000','7000','8000','9000','10000','1000','2000'
-#     ],
-#     '비트':[
-#         None,None,None,None,None,'0','1','2','3','4','5',None,None,None,None,None
-#     ]
-# })
-# ini_scan = pd.DataFrame({
-#     '레지스트 영역':[
-#         'EM000000','EM000900','EM001800','EM002700','DM003600','DM004500','DM005400','DM116300','DM117200','DM118100'
-#     ],
-#     '워드 수':[
-#         '900','900','900','900','900','900','900','900','900','900'
-#     ],
-#     '태그 그룹':[
-#         'L10_111','L10_111','L10_111','L10_111','L10_222','L10_222','L10_222','L10_333','L10_333','L10_333'
-#     ],
-#     '레지스트 영역2':[
-#         '0','900','1800','2700','18600','19500','20400','6300','7200','8100',
-#     ],
-#     'start2':[
-#         '0','900','1800','2700','18600','19500','20400','6300','7200','8100'
-#     ],
-#     'end2':[
-#         '899','1799','2699','3599','19499','20399','21299','7199','8099','8999'
-#     ],
-#     'off_set':[
-#     '0','0','0','0','0','0','0','0','0','0'
-#     ]
-# })
+data_scan = pd.concat(data_dfs, ignore_index=True) #data .csv 읽어들인 데이터프레임을 하나로 합친다
+ini_scan = pd.read_csv('Nori_tool_address/ini_scans/ini1.csv') #기준정보 .csv
 
 #컬럼 추가
 data_scan.insert(4, 'cal_scan_buffer', "")
@@ -68,16 +29,17 @@ data_scan.insert(7, 'FULL_ADDRESS', "")
 
 #처리 로직
 for i, data_scan_row in data_scan.iterrows(): #iterrows() 각 행의 인덱스와 데이터 값을 반환한다 --> data_scan 의 행을 반복하면서 각 행의 인덱스와 값을 반환한다
-    #'Tag_group' 의 값이 '태그 그룹' 에 있는지 검사
-    if data_scan_row['Tag_group'] in ini_scan.loc[:, '태그 그룹'].values: #1개 행마다 값을 비교하기 때문에 row[] 를 사용, loc[인덱스, 컬럼명], : 는 모든 행 선택
-        for j, ini_scan_row in ini_scan.iterrows():
+    for j, ini_scan_row in ini_scan.iterrows():
+        #'Tag_group' 의 값이 '태그 그룹' 에 있는지 검사
+        if data_scan_row['Tag_group'] in ini_scan.loc[:, '태그 그룹'].values: #1개 행마다 값을 비교하기 때문에 row[] 를 사용, loc[인덱스, 컬럼명], : 는 모든 행 선택
             #'Tag_group' 의 값이 '태그 그룹' 에 있으면서 'scan_buffer' 값이 'start2', 'end2' 범위에 들어오는 경우
             if data_scan_row['Tag_group'] == ini_scan_row['태그 그룹'] and int(data_scan_row['scan_buffer']) >= int(ini_scan_row['start2']) and int(data_scan_row['scan_buffer']) <= int(ini_scan_row['end2']): 
-                #.txt 파일에서 주석처리 부분                                
+                #.txt 파일에서 주석처리 부분
                 if ini_scan.at[j, 'off_set'] == 1:
                     data_scan.at[i, 'AD_FLAG'] = 'ERROR_OFFSET'
                     break
-                else:        
+                else:
+                    #
                     data_scan.at[i, 'AD_FLAG'] = 'OK' #'Tag_group' 의 값이 '태그 그룹' 에 있는 data_scan 의 i 번째 행의 'AD_FLAG' 컬럼에 'OK'
                     data_scan.at[i, 'PLC_AREA'] = ini_scan_row['레지스트 영역'][:3]# 'PLC_AREA' 컬럼에 레지스트 영역의 왼쪽부터 3자리 입력, ini_scan 은 ['레지스트 영역'] 컬럼 전체를 가져오기 때문에 ini_scan_row 를 사용한다, 
                     #'레지스트 영역' 뒤 부터 5자리가 '레지스트 영역2' 보다 큰 경우
@@ -103,21 +65,46 @@ for i, data_scan_row in data_scan.iterrows(): #iterrows() 각 행의 인덱스�
             #'Tag_group' 의 값이 '태그 그룹' 에 있지만 'scan_buffer' 값이 해당 범위를 벗어나는 경우
             else:
                 data_scan.at[i, 'AD_FLAG'] = 'ERROR_SCAN_NO'
-    # 'Tag_group' 의 값이 '태그 그룹' 에 없으면 'NO_TAG_GROUP'
-    else:
-        data_scan.at[i, 'AD_FLAG'] = 'NO_TAG_GROUP'
+        #'Tag_group' 의 값이 '태그 그룹' 에 없으면 'NO_TAG_GROUP'
+        else:
+            data_scan.at[i, 'AD_FLAG'] = 'NO_TAG_GROUP'
 
-# print(data_scan)
 
-# # 오라클 연동 ing...
-# conn = cx_Oracle.connect(user="username", password="password", dsn="dsn")
 
-# # insert the dataframe into the Oracle database
-# data_scan.to_sql(name='table_name', con=conn, if_exists='append', index=False)
+#오라클 연동
+user = 'TEST_USER'
+password = '1234'
+dns = 'localhost:1521/xepdb1'
 
+connection = cx_Oracle.connect(user, password, dns) #연결
+cursor = connection.cursor() #커서 -->쿼리문에 의해 반환되는 결과값을 저장하는 메모리 공간
+
+#데이터프레임 가공
+data_scan_ok = data_scan[data_scan['AD_FLAG'] == 'OK'] #데이터프레임의 'AD_FLAG' 값이 'OK' 인 대상만 insert 하겠다
+data_scan_ok = data_scan_ok.astype({'scan_buffer': 'int32', 'cal_scan_buffer': 'int32'}) #형변환
+# data_scan_ok['비트'] = data_scan_ok['비트'].fillna().astype(int) ### '비트' 컬럼의 결측값 처리 후 insert ing....
+data_scan = data_scan_ok.values.tolist() #데이터프레임을 2차원 리스트로
+
+#insert 쿼리
+insert_sql = """ 
+        INSERT INTO address(TAG_GROUP, TAG_NAME, SCAN_BUFFER, BIT, CAL_SCAN_BUFFER, AD_FLAG, PLC_AREA, FULL_ADDRESS, GUBUN) VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9)
+    """ 
+cursor.executemany(insert_sql, data_scan) #insert
+connection.commit() #전체 연결에 대한 트랜잭션 커밋
+# cursor.execute("commit") #특정 커서에 대한 커밋
+
+#들어간 갯수 확인
+cursor.execute('select count(*) from address')
+row = cursor.fetchone()
+print('삽입된 data는 총 ' + str(row[0]) + '개 입니다')
+
+
+
+cursor.close()
+connection.close()
 
 #데이터프레임의 구분자에 따라 접두사와 접미사를 다르게 해서 .csv 파일을 생성하는 중 ing...
 
-data_scan.to_csv('Nori_tool_address/Outputs/data.csv' #읽어들인 .txt 파일을 .csv 파일로 생성
-           , encoding='utf-8-sig' 
-           , index=False)
+# data_scan.to_csv('Nori_tool_address/Outputs/data.csv' #읽어들인 .txt 파일을 .csv 파일로 생성
+#            , encoding='utf-8-sig' 
+#            , index=False)
