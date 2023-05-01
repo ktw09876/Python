@@ -14,7 +14,7 @@ data_list = [
 #데이터프레임 생성, '라인 구분' 컬럼 추가
 data_dfs = []
 for data_name in data_list:
-    df = pd.read_csv(data_path + data_name, dtype={'비트': 'Int64'}, encoding='cp949')
+    df = pd.read_csv(data_path + data_name, dtype={'비트': 'Int64'}, encoding='cp949') #dtype={'비트': 'Int64'} '비트' 컬럼의 값을 insert 할 수 있도록 형변환
     df['라인 구분'] = df['Tag_group'].str.slice(0,3)
     data_dfs.append(df)
 
