@@ -1,5 +1,6 @@
 import pandas as pd
 import cx_Oracle
+import numpy as np
 
 #.csv 파일이 한 개 경우
 # data_scan = pd.read_csv('Nori_tool_address/data/data1.csv', encoding='cp949')
@@ -14,7 +15,7 @@ data_list = [
 #데이터프레임 생성, '라인 구분' 컬럼 추가
 data_dfs = []
 for data_name in data_list:
-    df = pd.read_csv(data_path + data_name, dtype={'비트': 'Int64'}, encoding='cp949') #dtype={'비트': 'Int64'} '비트' 컬럼의 값을 insert 할 수 있도록 형변환
+    df = pd.read_csv(data_path + data_name, encoding='cp949') #dtype={'비트': 'Int64'} '비트' 컬럼의 값을 insert 할 수 있도록 형변환 dtype={'비트': 'Int64'}, 
     df['라인 구분'] = df['Tag_group'].str.slice(0,3)
     data_dfs.append(df)
 
@@ -79,17 +80,31 @@ dns = 'localhost:1521/xepdb1'
 connection = cx_Oracle.connect(user, password, dns) #연결
 cursor = connection.cursor() #커서 -->쿼리문에 의해 반환되는 결과값을 저장하는 메모리 공간
 
+
+
 #데이터프레임 가공
 data_scan_ok = data_scan[data_scan['AD_FLAG'] == 'OK'] #데이터프레임의 'AD_FLAG' 값이 'OK' 인 대상만 insert 하겠다
-data_scan_ok = data_scan_ok.astype({'scan_buffer': 'int32', 'cal_scan_buffer': 'int32'}) #형변환
-# data_scan_ok['비트'] = data_scan_ok['비트'].fillna().astype(int) ### '비트' 컬럼의 결측값 처리 후 insert ing....
-data_scan = data_scan_ok.values.tolist() #데이터프레임을 2차원 리스트로
+data_scan_ok['비트'] = data_scan_ok['비트'].apply(lambda x: None if pd.isna(x) else x)
+
+
+#'비트' 컬럼의 None 값을 인서트 ing....
+# # None 값을 Null 값으로 변환하는 함수 정의
+# def none_to_null(data_scan_ok):
+#     return data_scan_ok if data_scan_ok is not None else cx_Oracle.NULL
+
+# # 데이터프레임에서 None 값을 Null 값으로 변환
+# data_scan = data_scan_ok.applymap(none_to_null)
+
+# data_scan_ok = data_scan_ok.where(pd.notnull(data_scan_ok), None) #형변환
+# data_scan_ok = data_scan_ok.fillna(None, method='ffill') #형변환
+# data_scan_ok = data_scan_ok.fillna('') #형변환
+print(data_scan_ok)
 
 #insert 쿼리
 insert_sql = """ 
-        INSERT INTO address(TAG_GROUP, TAG_NAME, SCAN_BUFFER, BIT, CAL_SCAN_BUFFER, AD_FLAG, PLC_AREA, FULL_ADDRESS, GUBUN) VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9)
+        INSERT INTO address VALUES(:TAG_GROUP, :TAG_NAME, :SCAN_BUFFER, :BIT, :CAL_SCAN_BUFFER, :AD_FLAG, :PLC_AREA, :FULL_ADDRESS, :GUBUN)
     """ 
-cursor.executemany(insert_sql, data_scan) #insert
+cursor.executemany(insert_sql, data_scan_ok.values.tolist()) #insert, #데이터프레임을 2차원 리스트로
 connection.commit() #전체 연결에 대한 트랜잭션 커밋
 # cursor.execute("commit") #특정 커서에 대한 커밋
 
