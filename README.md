@@ -1,7 +1,6 @@
-<!-- 
-실무에서 사용했던 데이터 처리 로직 중 'Address' 로직 구현
-처음 GCS1.0 원본 .csv 파일과 기준표가 되는 .txt 파일을 제공 받았습니다
-.txt 파일을 파싱(parsing)하여 .csv 파일을 생성하고 이와 원본 데이터를 이용해서 처리 로직에 따라
-필요한 2.0 데이터를 생성했습니다
-1.0 데이터의 행 개수가 늘어나면서 좀 더 효과적으로 처리할 수 있는 방법 찾는 중
--->
+# Data 생성
+<img width="100" src="https://user-images.githubusercontent.com/93371320/235865236-6d329a87-2d13-4880-bf71-40e10737fa46.png"/>
+<img width="100" src="https://user-images.githubusercontent.com/93371320/235865359-0a0ad5a7-db3b-4c23-8af4-baad337fc841.png"/>
+<img width="100" src="https://user-images.githubusercontent.com/93371320/235865366-336f81d4-7451-42ce-9a46-a5f85e998e91.png"/>
+<img width="100" src="https://user-images.githubusercontent.com/93371320/235839658-3be25dc4-499d-4f5d-86c3-4dcfa26c0a42.png"/>
+<img width="100" src="https://user-images.githubusercontent.com/93371320/235839913-758179e0-a32c-4e86-83c4-25a089a596ca.png"/>
