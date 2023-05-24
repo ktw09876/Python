@@ -113,6 +113,7 @@ connection.close()
 
 #데이터프레임의 구분자에 따라 접두사와 접미사를 다르게 해서 .csv 파일을 생성하는 중 ing...
 
-data_scan.to_csv('Nori_tool_address/Outputs/data.csv' #읽어들인 .txt 파일을 .csv 파일로 생성
+#읽어들인 .txt 파일을 .csv 파일로 생성
+data_scan.to_csv('Nori_tool_address/Outputs/data.csv' 
            , encoding='utf-8-sig' 
            , index=False)
