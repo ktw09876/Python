@@ -38,8 +38,8 @@ for i, data_scan_row in data_scan.iterrows(): #iterrows() 각 행의 인덱스�
             #'Tag_group' 의 값이 '태그 그룹' 에 있으면서 'scan_buffer' 값이 'start2', 'end2' 범위에 들어오는 경우
             if data_scan_row['Tag_group'] == ini_scan_row['태그 그룹'] and int(data_scan_row['scan_buffer']) >= int(ini_scan_row['start2']) and int(data_scan_row['scan_buffer']) <= int(ini_scan_row['end2']): 
                 #.txt 파일에서 주석처리 부분
-                if ini_scan.at[j, 'off_set'] == 1:
-                    data_scan.at[i, 'AD_FLAG'] = 'ERROR_OFFSET'
+                if ini_scan.loc[j, 'off_set'] == 1:
+                    data_scan.loc[i, 'AD_FLAG'] = 'ERROR_OFFSET'
                     break
                 else:
                     #
@@ -56,7 +56,7 @@ for i, data_scan_row in data_scan.iterrows(): #iterrows() 각 행의 인덱스�
                         data_scan.at[i, 'cal_scan_buffer'] = data_scan.at[i, 'scan_buffer']
 
                     #조건에 따라 계산된 'scan_buffer' 를 이용해서 'FULL_ADDRESS' 값을 생성
-                    data_scan.at[i, 'FULL_ADDRESS'] = ini_scan_row['레지스트 영역'][:3] + str(data_scan.at[i, 'cal_scan_buffer']).rjust(5,'0')
+                    data_scan.loc[i, 'FULL_ADDRESS'] = ini_scan_row['레지스트 영역'][:3] + str(data_scan.at[i, 'cal_scan_buffer']).rjust(5,'0')
                     #'비트' 컬럼 값이 NaN 인 경우
                     if pd.isna(data_scan_row['비트']): 
                         data_scan_row['비트'] = None
@@ -64,7 +64,7 @@ for i, data_scan_row in data_scan.iterrows(): #iterrows() 각 행의 인덱스�
 
                     #'비트' 컬럼 값이 NaN 이 아닌 경우
                     else:
-                        data_scan.at[i, 'FULL_ADDRESS'] += '.' + str(int(data_scan_row['비트'])).rjust(2, '0') #'비트' 를 int 로 하지 않으면 'DM117000.5.0' 와 같은 형태로 나옴
+                        data_scan.at[i, 'FULL_ADDRESS'] += '.' + str(data_scan_row['비트']).rjust(2, '0')
                         break
             #'Tag_group' 의 값이 '태그 그룹' 에 있지만 'scan_buffer' 값이 해당 범위를 벗어나는 경우
             else:
@@ -73,7 +73,7 @@ for i, data_scan_row in data_scan.iterrows(): #iterrows() 각 행의 인덱스�
         else:
             data_scan.at[i, 'AD_FLAG'] = 'NO_TAG_GROUP'
 
-
+print(data_scan)
 
 #오라클 연동
 user = 'TEST_USER'
@@ -84,17 +84,14 @@ connection = cx_Oracle.connect(user, password, dns) #연결
 cursor = connection.cursor() #커서 -->쿼리문에 의해 반환되는 결과값을 저장하는 메모리 공간
 
 #데이터프레임 가공
-data_scan_ok = data_scan[data_scan['AD_FLAG'] == 'OK'] #데이터프레임의 'AD_FLAG' 값이 'OK' 인 대상만 insert 하겠다
+#결측값 처리
+data_scan_ok = data_scan[data_scan['AD_FLAG'] == 'OK'].fillna('') #데이터프레임의'AD_FLAG' 값이 'OK'만 insert 하겠다 그 중에서 결측값이 있는 경우 그대로 insert 하겠다
 
-#'비트' 컬럼의 결측값 처리
-data_scan_ok = data_scan_ok.fillna('AAA') #결측값을 특정 문자열로 바꾸고
-data_scan_ok = data_scan_ok.replace('AAA', None) #이를 다시 None 으로 바꿈
-
-# print(data_scan_ok)
+print(data_scan_ok)
 
 #insert 쿼리
 insert_sql = """ 
-        INSERT INTO address VALUES(:TAG_GROUP, :TAG_NAME, :SCAN_BUFFER, :BIT, :CAL_SCAN_BUFFER, :AD_FLAG, :PLC_AREA, :FULL_ADDRESS, :GUBUN)
+        INSERT INTO address VALUES(:TAG_GROUP, :TAG_NAME, :SCAN_BUFFER, :BIT, :CAL_SCAN_BUFFER, :AD_FLAG, :PLC_AREA, :FULL_ADDRESS, :LINE)
     """ 
 
 cursor.executemany(insert_sql, data_scan_ok.values.tolist()) #insert, #데이터프레임을 2차원 리스트로
