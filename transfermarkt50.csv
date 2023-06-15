@@ -1,4 +1,4 @@
-number,name,position,age,nation,team,value
+﻿number,name,position,age,nation,team,value
 1,Kylian Mbappé,Centre-Forward,24,France,Paris Saint-Germain,€180.00m 
 2,Erling Haaland,Centre-Forward,22,Norway,Manchester City,€170.00m 
 3,Vinicius Junior,Left Winger,22,Brazil,Real Madrid,€150.00m  
@@ -47,5 +47,5 @@ number,name,position,age,nation,team,value
 46,Jack Grealish,Left Winger,27,England,Manchester City,€70.00m 
 47,Leroy Sané,Right Winger,27,Germany,Bayern Munich,€70.00m 
 48,Marquinhos,Centre-Back,29,Brazil,Paris Saint-Germain,€70.00m 
-49,Mohamed Salah,Right Winger,30,Egypt,Liverpool FC,€70.00m 
+49,Mohamed Salah,Right Winger,31,Egypt,Liverpool FC,€70.00m 
 50,Neymar,Left Winger,31,Brazil,Paris Saint-Germain,€70.00m 
