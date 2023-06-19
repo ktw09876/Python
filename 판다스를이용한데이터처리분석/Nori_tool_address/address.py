@@ -19,16 +19,15 @@ for data_name in data_list:
     data_dfs.append(df)
 
 data_scan = pd.concat(data_dfs, ignore_index=True) #data .csv 읽어들인 데이터프레임을 하나로 합친다
-ini_scan = pd.read_csv('Nori_tool_address/ini_scans/ini1.csv') #기준정보 .csv
-
+ini_scan = pd.read_csv('Nori_tool_address/ini_scans/ini1.csv') #기준정보 .csv를 읽음
 
 
 
 #컬럼 추가
-data_scan.insert(4, 'cal_scan_buffer', "")
+data_scan.insert(4, 'cal_scan_buffer', '')
 data_scan.insert(5, 'AD_FLAG', '')
-data_scan.insert(6, 'PLC_AREA', "")
-data_scan.insert(7, 'FULL_ADDRESS', "")
+data_scan.insert(6, 'PLC_AREA', '')
+data_scan.insert(7, 'FULL_ADDRESS', '')
 
 #처리 로직
 for i, data_scan_row in data_scan.iterrows(): #iterrows() 각 행의 인덱스와 데이터 값을 반환한다 --> data_scan 의 행을 반복하면서 각 행의 인덱스와 값을 반환한다
@@ -57,12 +56,11 @@ for i, data_scan_row in data_scan.iterrows(): #iterrows() 각 행의 인덱스�
 
                     #조건에 따라 계산된 'scan_buffer' 를 이용해서 'FULL_ADDRESS' 값을 생성
                     data_scan.loc[i, 'FULL_ADDRESS'] = ini_scan_row['레지스트 영역'][:3] + str(data_scan.at[i, 'cal_scan_buffer']).rjust(5,'0')
-                    #'비트' 컬럼 값이 NaN 인 경우
+                    #'비트' 컬럼 값이 NaN 인 경우 반복문을 종료
                     if pd.isna(data_scan_row['비트']): 
-                        data_scan_row['비트'] = None
                         break
 
-                    #'비트' 컬럼 값이 NaN 이 아닌 경우
+                    #'비트' 컬럼 값이 NaN 이 아닌 경우 소수점 값을 추가로 생성 후 반복문 종료
                     else:
                         data_scan.at[i, 'FULL_ADDRESS'] += '.' + str(data_scan_row['비트']).rjust(2, '0')
                         break
@@ -73,7 +71,6 @@ for i, data_scan_row in data_scan.iterrows(): #iterrows() 각 행의 인덱스�
         else:
             data_scan.at[i, 'AD_FLAG'] = 'NO_TAG_GROUP'
 
-print(data_scan)
 
 #오라클 연동
 user = 'TEST_USER'
