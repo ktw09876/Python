@@ -5,7 +5,7 @@ import cx_Oracle
 # data_scan = pd.read_csv('Nori_tool_address/data/data1.csv', encoding='cp949')
 
 #.txt 파일이 두 개 이상 경우
-data_path = 'Pandas_start/Nori_tool_address/data/'
+data_path = 'Data_Processing/Pandas/Nori_tool_address/data/'
 data_list = [
         'data1.csv',
         'data2.csv'
@@ -19,7 +19,7 @@ for data_name in data_list:
     data_dfs.append(df)
 
 data_scan = pd.concat(data_dfs, ignore_index=True) #data .csv 읽어들인 데이터프레임을 하나로 합친다
-ini_scan = pd.read_csv('Pandas_start/Nori_tool_address/ini_scans/ini1.csv') #기준정보 .csv를 읽음
+ini_scan = pd.read_csv('Data_Processing/Pandas/Nori_tool_address/ini_scans/ini1.csv') #기준정보 .csv를 읽음
 
 
 
@@ -108,6 +108,6 @@ connection.close()
 #데이터프레임의 구분자에 따라 접두사와 접미사를 다르게 해서 .csv 파일을 생성하는 중 ing...
 
 #읽어들인 .txt 파일을 .csv 파일로 생성 
-data_scan.to_csv('Pandas_start/Nori_tool_address/Outputs/data.csv' 
+data_scan.to_csv('Data_Processing/Pandas/Nori_tool_address/Outputs/data.csv' 
            , encoding='utf-8-sig' 
            , index=False)
