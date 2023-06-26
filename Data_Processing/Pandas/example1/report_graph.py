@@ -3,17 +3,6 @@ import pandas as pd
 df = pd.read_csv("result_df.csv")
 # print(df.shape) #(187, 149)
 
-
-# #이미지 생성
-# def create_flag_link(row):
-#     if row == 'AS':
-#         row = 'US'
-#     row = row.lower()
-#     flag_link = "https://public.flourish.studio/country-flags/svg/" + row + ".svg"
-#     return flag_link
-
-# doc_final_country['iso2'] = doc_final_country['iso2'].apply(create_flag_link)
-
 #국가 정보 가져오기
 country_path = 'Data_Processing/Pandas/example1/COVID-19-master/csse_covid_19_data/'
 country_info = pd.read_csv(
@@ -44,13 +33,30 @@ df_final_country = pd.merge(df, country_info, how='left', on='Country_Region')
 #iso2값이 없는 경우 삭제
 df_final_country = df_final_country.dropna(subset=['iso2'])
 
-#국기 이미지 가져오기
+# #국기 이미지 가져오기
+# def create_flag_link(iso2):
+#     flag_link = 'https://flagcdn.com/48x36/' + iso2 + '.png'
+#     return flag_link
+
+# df_final_country['iso2'] = df_final_country['iso2'].apply(create_flag_link)
+# # print(df_final_country)
+
+
+#이미지 생성
 def create_flag_link(iso2):
-    flag_link = 'https://flagcdn.com/48x36/' + iso2 + '.png'
+    if iso2 == 'AS':
+        iso2 = 'US'
+    iso2 = iso2.lower()
+    flag_link = "https://public.flourish.studio/country-flags/svg/" + iso2 + ".svg"
     return flag_link
 
 df_final_country['iso2'] = df_final_country['iso2'].apply(create_flag_link)
-# print(df_final_country)
+
+
+
+
+
+
 
 #'iso2'컬럼명 위치 조정
 #컬럼명을 리스트로 가져오기
