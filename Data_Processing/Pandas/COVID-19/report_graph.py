@@ -4,7 +4,7 @@ df = pd.read_csv("result_df.csv")
 # print(df.shape) #(187, 149)
 
 #국가 정보 가져오기
-country_path = 'Data_Processing/Pandas/example1/COVID-19-master/csse_covid_19_data/'
+country_path = 'Data_Processing/Pandas/COVID-19/COVID-19-master/csse_covid_19_data/'
 country_info = pd.read_csv(
         country_path #경로
         + 'UID_ISO_FIPS_LookUp_Table.csv' #파일명

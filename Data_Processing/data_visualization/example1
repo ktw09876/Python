@@ -1,0 +1,3 @@
+import chart_studio.plotly as py
+import cufflinks as cf
+cf.go_offline(connected=True)

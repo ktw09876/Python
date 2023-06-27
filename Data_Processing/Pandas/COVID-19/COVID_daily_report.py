@@ -3,7 +3,7 @@ import json
 import os
 
 # #daily_report.csv 읽기
-daily_report_path = 'Data_Processing/Pandas/example1/COVID-19-master/csse_covid_19_data/csse_covid_19_daily_reports/'
+daily_report_path = 'Data_Processing/Pandas/COVID-19/COVID-19-master/csse_covid_19_data/csse_covid_19_daily_reports/'
 # daily_report_df = pd.read_csv(daily_report_path + '01-22-2020.csv', encoding='utf-8-sig')
 # # print(daily_report_df.head())
 
@@ -21,7 +21,7 @@ daily_report_path = 'Data_Processing/Pandas/example1/COVID-19-master/csse_covid_
 # # print(daily_report_df.shape) #29행, 13컬럼
 
 # #국가 정보 가져오기
-# country_path = 'Data_Processing/Pandas/example1/COVID-19-master/csse_covid_19_data/'
+# country_path = 'Data_Processing/Pandas/COVID-19/COVID-19-master/csse_covid_19_data/'
 # country_info = pd.read_csv(country_path + 'UID_ISO_FIPS_LookUp_Table.csv', encoding='utf-8-sig')
 # # print(country_info.head()) #iso2가 국가기호 2자리
 # # print(country_info.shape) #3560행, 13컬럼
@@ -38,7 +38,7 @@ daily_report_path = 'Data_Processing/Pandas/example1/COVID-19-master/csse_covid_
 # # print(non_df.head())
 
 #국가별로 다양한 'Country_Region'값을 한가지로 만들어놓은 json파일
-json_path = 'Data_Processing/Pandas/example1/COVID-19-master/csse_covid_19_data/'
+json_path = 'Data_Processing/Pandas/COVID-19/COVID-19-master/csse_covid_19_data/'
 with open(json_path + 'country_convert.json', 'r', encoding='utf-8-sig') as json_file:
     json_data = json.load(json_file)
     # print(json_data.keys())
